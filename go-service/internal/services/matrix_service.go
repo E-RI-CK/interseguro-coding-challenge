@@ -1,86 +1,130 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"go-service/internal/dto"
 	"go-service/internal/utils"
-
-	"gonum.org/v1/gonum/mat"
+	"math"
+	"net/http"
 )
 
-func MatrixService(matrix [][]float64) (dto.QRResponse, error) {
+func MatrixService(matrix [][]float64) (dto.MatrixResponse, error) {
 
-	//Matrix validation
+	// Matrix validation
 	validation := utils.ValidateMatrix(matrix)
 
 	if !validation.Success {
-		return dto.QRResponse{}, errors.New(validation.Message)
+		return dto.MatrixResponse{}, errors.New(validation.Message)
 	}
 
-	rows := len(matrix)
-	cols := len(matrix[0])
+	q, r := gramSchmidt(matrix)
 
-	//Convert [][]float64 to []float64
-	data := make([]float64, 0)
-
-	for _, row := range matrix {
-		data = append(data, row...)
+	qrResponse := dto.QRResponse{
+		Q: q,
+		R: r,
 	}
 
-	//Create dense matrix
-	A := mat.NewDense(rows, cols, data)
+	// Send to Node
+	result, err := sendToNode(qrResponse)
 
-	//QR decomposition
-	var qr mat.QR
-	qr.Factorize(A)
+	if err != nil {
+		return dto.MatrixResponse{}, err
+	}
 
-	//Extract Q
-	var q mat.Dense
-	qr.QTo(&q)
-
-	//Extract R
-	var r mat.Dense
-	qr.RTo(&r)
-
-	//Match manual Gram-Schmidt sign convention
-	normalizeSigns(&q, &r)
-
-	return dto.QRResponse{
-		Q: utils.DenseToArray(&q),
-		R: utils.DenseToArray(&r),
-	}, nil
-
+	return result, nil
 }
 
-func normalizeSigns(q, r *mat.Dense) {
-	qRows, qCols := q.Dims()
-	_, rCols := r.Dims()
+func gramSchmidt(a [][]float64) ([][]float64, [][]float64) {
 
-	for col := 0; col < qCols; col++ {
+	rows := len(a)
+	cols := len(a[0])
 
-		//Find first non-zero value in column
-		for row := 0; row < qRows; row++ {
+	//Initialize Q and R
+	q := make([][]float64, rows)
+	for i := range q {
+		q[i] = make([]float64, cols)
+	}
 
-			value := q.At(row, col)
+	r := make([][]float64, cols)
+	for i := range r {
+		r[i] = make([]float64, cols)
+	}
 
-			if value != 0 {
+	//Process each column
+	for j := 0; j < cols; j++ {
 
-				//If first non-zero is negative
-				if value < 0 {
+		//Copy current column of A into v
+		v := make([]float64, rows)
 
-					//Multiply Q column by -1
-					for i := 0; i < qRows; i++ {
-						q.Set(i, col, -q.At(i, col))
-					}
+		for i := 0; i < rows; i++ {
+			v[i] = a[i][j]
+		}
 
-					//Multiply corresponding R row by -1
-					for j := 0; j < rCols; j++ {
-						r.Set(col, j, -r.At(col, j))
-					}
-				}
+		//Subtract projections
+		for k := 0; k < j; k++ {
 
-				break
+			var dot float64
+
+			for i := 0; i < rows; i++ {
+				dot += q[i][k] * a[i][j]
+			}
+
+			r[k][j] = dot
+
+			for i := 0; i < rows; i++ {
+				v[i] -= dot * q[i][k]
 			}
 		}
+
+		//Compute norm
+		var norm float64
+
+		for i := 0; i < rows; i++ {
+			norm += v[i] * v[i]
+		}
+
+		norm = math.Sqrt(norm)
+
+		r[j][j] = utils.RoundDecimal(norm, 4)
+
+		//Normalize vector
+		for i := 0; i < rows; i++ {
+			q[i][j] = utils.RoundDecimal(v[i]/norm, 4)
+		}
 	}
+
+	return q, r
+}
+
+func sendToNode(qr dto.QRResponse) (dto.MatrixResponse, error) {
+
+	jsonData, err := json.Marshal(qr)
+
+	if err != nil {
+		return dto.MatrixResponse{}, err
+	}
+
+	resp, err := http.Post(
+		"http://localhost:4000/api/statistics",
+		"application/json",
+		bytes.NewBuffer(jsonData),
+	)
+
+	if err != nil {
+		return dto.MatrixResponse{}, err
+	}
+
+	defer resp.Body.Close()
+
+	var result dto.MatrixResponse
+
+	err = json.NewDecoder(resp.Body).Decode(&result)
+
+	if err != nil {
+		return dto.MatrixResponse{}, err
+	}
+
+	return result, nil
 }
