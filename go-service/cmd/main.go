@@ -26,7 +26,7 @@ func main() {
 
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: []string{os.Getenv("WEB_CLIENT_API_URL")},
-		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders: []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 	}))
 

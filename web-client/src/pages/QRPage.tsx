@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -13,7 +13,9 @@ import type { QRResponse } from "@/types/qr"
 import { toast } from "sonner"
 import { Button } from '@/components/ui/button';
 import { useTheme } from "@/components/theme-provider"
-import { Moon, Sun } from "lucide-react"
+import { LogOut, Moon, Sun } from "lucide-react"
+import { useNavigate } from "react-router-dom"
+import { getNameOfToken, isTokenValid } from "@/utils/jwt"
 
 
 
@@ -25,20 +27,33 @@ function createMatrix(rows: number, cols: number) {
 
 export default function QRPage() {
 
-    const { theme, setTheme } = useTheme()
+    const { theme, setTheme } = useTheme();
+    const token = localStorage.getItem("token");
+    const [userName] = useState<string>(getNameOfToken(token!));
+    const navigate = useNavigate();
 
-    const [rows, setRows] = useState(3)
-    const [cols, setCols] = useState(3)
+    const [rows, setRows] = useState(3);
+    const [cols, setCols] = useState(3);
 
     const [matrix, setMatrix] = useState<number[][]>([
         [1, 1, 1],
         [0, 1, 1],
         [1, 0, -1]
-    ])
+    ]);
 
-    const [result, setResult] = useState<QRResponse | null>(null)
+    const [result, setResult] = useState<QRResponse | null>(null);
 
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!token || !isTokenValid(token)) {
+
+            localStorage.removeItem("token");
+
+            navigate("/");
+        }
+
+    }, []);
 
     const resizeMatrix = () => {
         setMatrix(createMatrix(rows, cols))
@@ -57,11 +72,22 @@ export default function QRPage() {
         setResult(null)
     }
 
+    const logOut = () => {
+        localStorage.removeItem("token");
+        navigate("/")
+    }
+
     const handleCalculate = async () => {
         try {
             setLoading(true)
 
-            const response = await calculateQR(matrix)
+            const response = await calculateQR(matrix, localStorage.getItem("token") || "")
+
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                navigate("/")
+            }
+
             const data = await response.json();
             if (!response.ok) {
                 throw data;
@@ -78,18 +104,30 @@ export default function QRPage() {
 
     return (
         <div className="min-h-screen bg-background p-4 md:p-8">
-            <div className="mb-5 flex justify-end items-center">
-                <Button
-                    onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                >
-                    {
-                        theme === 'dark' && <Sun />
-                    }
-                    {
-                        theme === 'light' && <Moon />
-                    }
-                </Button>
-            </div>
+            <Card className="flex flex-row justify-between items-center mb-5 border p-3">
+                <CardHeader className="w-1/2">
+                    <CardTitle className="font-black text-[30px]">WellCome Back {userName}!</CardTitle>
+                </CardHeader>
+                <CardContent className="flex justify-end items-center gap-x-3 w-1/2">
+                    <Button
+                        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                    >
+                        {
+                            theme === 'dark' && <Sun />
+                        }
+                        {
+                            theme === 'light' && <Moon />
+                        }
+                    </Button>
+                    <Button
+                        onClick={() => logOut()}
+                        variant={"destructive"}
+                    >
+                        <LogOut />
+                        Log Out
+                    </Button>
+                </CardContent>
+            </Card>
             <div className="mx-auto max-w-7xl space-y-6">
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                     {/* LEFT */}

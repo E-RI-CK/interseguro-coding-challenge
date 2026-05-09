@@ -2,6 +2,7 @@ package routes
 
 import (
 	"go-service/internal/controllers"
+	middleware "go-service/internal/middlewares"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -9,5 +10,11 @@ import (
 func Setup(app *fiber.App) {
 	api := app.Group("/api")
 
-	api.Post("/qr", controllers.MatrixController)
+	api.Post("/auth/login", controllers.Login)
+
+	api.Post(
+		"/qr",
+		middleware.Protected(),
+		controllers.MatrixController,
+	)
 }
