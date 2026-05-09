@@ -1,0 +1,7 @@
+.air
+tmp
+dist
+coverage
+*.log
+.env
+node_modules

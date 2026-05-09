@@ -3,7 +3,7 @@ import type { LucideIcon } from "lucide-react";
 
 interface Props {
   title: string
-  value: string | number
+  value: string | number | boolean
   icon: LucideIcon
 }
 

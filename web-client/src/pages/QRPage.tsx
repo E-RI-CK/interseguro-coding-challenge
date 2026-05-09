@@ -141,11 +141,13 @@ export default function QRPage() {
                             <ResultPanel
                                 title="Matrix Q (Orthogonal)"
                                 matrix={result?.q.matrix}
+                                isDiagonal={result?.q.statistics.is_diagonal}
                             />
 
                             <ResultPanel
                                 title="Matrix R (Upper Triangular)"
                                 matrix={result?.r.matrix}
+                                isDiagonal={result?.r.statistics.is_diagonal}
                             />
                         </CardContent>
                     </Card>

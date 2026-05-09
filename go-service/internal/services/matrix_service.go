@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"go-service/internal/dto"
 	"go-service/internal/utils"
 	"math"
 	"net/http"
+	"os"
 )
 
 func MatrixService(matrix [][]float64) (dto.MatrixResponse, error) {
@@ -106,8 +108,12 @@ func sendToNode(qr dto.QRResponse) (dto.MatrixResponse, error) {
 		return dto.MatrixResponse{}, err
 	}
 
+	apiBase := os.Getenv("NODE_SERVICE_API_URL")
+
+	url := fmt.Sprintf("%s/statistics", apiBase)
+
 	resp, err := http.Post(
-		"http://localhost:4000/api/statistics",
+		url,
 		"application/json",
 		bytes.NewBuffer(jsonData),
 	)

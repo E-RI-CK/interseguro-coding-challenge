@@ -1,13 +1,27 @@
+import { Badge } from "../ui/badge";
+
 interface Props {
-  title: string
-  matrix?: number[][]
+  title: string;
+  matrix?: number[][];
+  isDiagonal: boolean | undefined;
 }
 
-export function ResultPanel({ title, matrix }: Props) {
+export function ResultPanel({ title, matrix, isDiagonal }: Props) {
   return (
     <div className="space-y-3">
-      <h3 className="font-medium">{title}</h3>
-
+      <div className="inline-flex gap-x-2 items-center">
+        <h3 className="font-medium">{title}</h3>
+        {
+          (typeof isDiagonal !== 'undefined')
+          && (
+            (isDiagonal)
+              ?
+              <Badge>Diagonal</Badge>
+              :
+              <Badge variant={"destructive"}>Non-diagonal</Badge>
+          )
+        }
+      </div>
       <div className="bg-muted rounded-lg p-4 overflow-auto">
         {!matrix ? (
           <p className="text-sm text-muted-foreground">

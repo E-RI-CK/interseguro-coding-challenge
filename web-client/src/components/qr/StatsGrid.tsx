@@ -15,6 +15,7 @@ interface Props {
         min: number;
         average: number;
         sum: number;
+        is_diagonal: boolean;
     },
     matrix: Matrix;
 }
@@ -47,6 +48,12 @@ export function StatsGrid({ stats, matrix }: Props) {
                 value={stats.sum}
                 icon={FileBarChart}
             />
+
+            {/* <StatsCard
+                title={`${matrix}-Is Diagonal`}
+                value={stats.is_diagonal}
+                icon={FileBarChart}
+            /> */}
         </div>
     )
 }

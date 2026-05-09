@@ -12,16 +12,20 @@ import (
 
 func main() {
 
-	err := godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file not found")
+	}
 
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	port := os.Getenv("PORT")
+
+	if port == "" {
+		port = "3000"
 	}
 
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: []string{"http://localhost:5173"},
+		AllowOrigins: []string{os.Getenv("WEB_CLIENT_API_URL")},
 		AllowHeaders: []string{"Origin", "Content-Type", "Accept"},
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
 	}))
@@ -32,5 +36,5 @@ func main() {
 
 	routes.Setup(app)
 
-	app.Listen(":" + os.Getenv("PORT"))
+	app.Listen(":" + port)
 }
