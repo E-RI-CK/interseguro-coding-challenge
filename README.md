@@ -228,6 +228,8 @@ Todos los servicios son orquestados mediante:
 
 # Ejecución en modo desarrollo (sin Docker)
 
+Ejecutar cada proyecto en una terminal independiente
+
 ## Go Service
 
 ```bash
