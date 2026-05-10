@@ -71,7 +71,7 @@ func TestGramSchmidt_Q_3x3Matrix(t *testing.T) {
 }
 
 // Test Q Matrix_2 output
-func TestGramSchmidt_QValidOutput_2(t *testing.T) {
+func TestGramSchmidt_Q_2x2Matrix(t *testing.T) {
 
 	matrix := [][]float64{
 		{-1, 3},
@@ -103,7 +103,7 @@ func TestGramSchmidt_QValidOutput_2(t *testing.T) {
 }
 
 // Test R Matrix_1 output
-func TestGramSchmidt_RValidOutput_1(t *testing.T) {
+func TestGramSchmidt_R_3x3Matrix(t *testing.T) {
 
 	matrix := [][]float64{
 		{1, 1, 1},
@@ -137,7 +137,7 @@ func TestGramSchmidt_RValidOutput_1(t *testing.T) {
 }
 
 // Test R Matrix_2 output
-func TestGramSchmidt_RValidOutput_2(t *testing.T) {
+func TestGramSchmidt_R_2x2Matrix(t *testing.T) {
 
 	matrix := [][]float64{
 		{-1, 3},

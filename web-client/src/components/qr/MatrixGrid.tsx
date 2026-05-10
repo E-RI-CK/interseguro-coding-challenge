@@ -1,19 +1,26 @@
 import { Input } from "@/components/ui/input";
 
 interface Props {
-  matrix: number[][]
-  setMatrix: (matrix: number[][]) => void
+  matrix: string[][]
+  setMatrix: (matrix: string[][]) => void
 }
 
 export function MatrixGrid({ matrix, setMatrix }: Props) {
+
   const updateCell = (
     rowIndex: number,
     colIndex: number,
     value: string
   ) => {
+
+    // Allow negatives and decimals
+    if (!/^[-]?\d*\.?\d*$/.test(value)) {
+      return
+    }
+
     const copy = matrix.map((row) => [...row])
 
-    copy[rowIndex][colIndex] = Number(value)
+    copy[rowIndex][colIndex] = value
 
     setMatrix(copy)
   }
@@ -29,10 +36,15 @@ export function MatrixGrid({ matrix, setMatrix }: Props) {
         row.map((value, colIndex) => (
           <Input
             key={`${rowIndex}-${colIndex}`}
-            type="number"
+            type="text"
+            inputMode="decimal"
             value={value}
             onChange={(e) =>
-              updateCell(rowIndex, colIndex, e.target.value)
+              updateCell(
+                rowIndex,
+                colIndex,
+                e.target.value
+              )
             }
             className="text-center"
           />

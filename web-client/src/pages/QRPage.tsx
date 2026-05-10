@@ -1,124 +1,160 @@
 import { useEffect, useState } from "react"
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
 import { MatrixConfig } from "@/components/qr/MatrixConfig"
 import { MatrixGrid } from "@/components/qr/MatrixGrid"
 import { ResultPanel } from "@/components/qr/ResultPanel"
 import { ActionBar } from "@/components/qr/ActionBar"
 import { StatsGrid } from "@/components/qr/StatsGrid"
-
 import { calculateQR } from "@/services/qr.service"
 import type { QRResponse } from "@/types/qr"
 import { toast } from "sonner"
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
 import { LogOut, Moon, Sun } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { getNameOfToken, isTokenValid } from "@/utils/jwt"
 
-
-
 function createMatrix(rows: number, cols: number) {
     return Array.from({ length: rows }, () =>
-        Array.from({ length: cols }, () => 0)
+        Array.from({ length: cols }, () => "0")
     )
 }
 
 export default function QRPage() {
 
-    const { theme, setTheme } = useTheme();
-    const token = localStorage.getItem("token");
-    const [userName] = useState<string>(getNameOfToken(token!));
-    const navigate = useNavigate();
+    const { theme, setTheme } = useTheme()
 
-    const [rows, setRows] = useState(3);
-    const [cols, setCols] = useState(3);
+    const token = localStorage.getItem("token")
 
-    const [matrix, setMatrix] = useState<number[][]>([
-        [1, 1, 1],
-        [0, 1, 1],
-        [1, 0, -1]
-    ]);
+    const [userName] = useState<string>(getNameOfToken(token!))
 
-    const [result, setResult] = useState<QRResponse | null>(null);
+    const navigate = useNavigate()
 
-    const [loading, setLoading] = useState(false);
+    const [rows, setRows] = useState(3)
+
+    const [cols, setCols] = useState(3)
+
+    const [matrix, setMatrix] = useState<string[][]>([
+        ["1", "1", "1"],
+        ["0", "1", "1"],
+        ["1", "0", "-1"]
+    ])
+
+    const [result, setResult] = useState<QRResponse | null>(null)
+
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
+
         if (!token || !isTokenValid(token)) {
 
-            localStorage.removeItem("token");
+            localStorage.removeItem("token")
 
-            navigate("/");
+            navigate("/")
         }
 
-    }, []);
+    }, [])
 
     const resizeMatrix = () => {
+
         setMatrix(createMatrix(rows, cols))
     }
 
     const randomize = () => {
+
         const random = matrix.map((row) =>
-            row.map(() => Math.floor(Math.random() * 10))
+            row.map(() => String(Math.floor(Math.random() * 10)))
         )
 
         setMatrix(random)
     }
 
     const clear = () => {
+
         setMatrix(createMatrix(rows, cols))
+
         setResult(null)
     }
 
     const logOut = () => {
-        localStorage.removeItem("token");
+
+        localStorage.removeItem("token")
+
         navigate("/")
     }
 
     const handleCalculate = async () => {
+
         try {
+
             setLoading(true)
 
-            const response = await calculateQR(matrix, localStorage.getItem("token") || "")
+            const parsedMatrix = matrix.map((row) =>
+                row.map((value) => Number(value))
+            )
+
+            const response = await calculateQR(
+                parsedMatrix,
+                localStorage.getItem("token") || ""
+            )
 
             if (response.status === 401) {
-                localStorage.removeItem("token");
+
+                localStorage.removeItem("token")
+
                 navigate("/")
             }
 
-            const data = await response.json();
+            const data = await response.json()
+
             if (!response.ok) {
-                throw data;
+                throw data
             }
+
             setResult(data)
 
         } catch (error: any) {
-            const errorMessage = error.error || error.response?.data?.message || "Ocurrió un error inesperado";
-            toast.error('Bad Request', { position: "top-right", description: errorMessage })
+
+            const errorMessage =
+                error.error ||
+                error.response?.data?.message ||
+                "Ocurrió un error inesperado"
+
+            toast.error("Bad Request", {
+                position: "top-right",
+                description: errorMessage,
+            })
+
         } finally {
+
             setLoading(false)
         }
     }
 
     return (
         <div className="min-h-screen bg-background p-4 md:p-8">
+
             <Card className="flex flex-row justify-between items-center mb-5 border p-3">
+
                 <CardHeader className="w-1/2">
-                    <CardTitle className="font-black text-[30px]">WellCome Back {userName}!</CardTitle>
+
+                    <CardTitle className="font-black text-[30px]">
+                        WellCome Back {userName}!
+                    </CardTitle>
+
                 </CardHeader>
+
                 <CardContent className="flex justify-end items-center gap-x-3 w-1/2">
+
                     <Button
-                        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                        onClick={() =>
+                            setTheme(theme === "light" ? "dark" : "light")
+                        }
                     >
-                        {
-                            theme === 'dark' && <Sun />
-                        }
-                        {
-                            theme === 'light' && <Moon />
-                        }
+                        {theme === "dark" && <Sun />}
+                        {theme === "light" && <Moon />}
                     </Button>
+
                     <Button
                         onClick={() => logOut()}
                         variant={"destructive"}
@@ -126,18 +162,28 @@ export default function QRPage() {
                         <LogOut />
                         Log Out
                     </Button>
+
                 </CardContent>
+
             </Card>
+
             <div className="mx-auto max-w-7xl space-y-6">
+
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+
                     {/* LEFT */}
                     <div className="space-y-6">
+
                         <Card>
+
                             <CardHeader>
-                                <CardTitle>Matrix Configuration</CardTitle>
+                                <CardTitle>
+                                    Matrix Configuration
+                                </CardTitle>
                             </CardHeader>
 
                             <CardContent>
+
                                 <MatrixConfig
                                     rows={rows}
                                     cols={cols}
@@ -145,20 +191,28 @@ export default function QRPage() {
                                     setCols={setCols}
                                     onResize={resizeMatrix}
                                 />
+
                             </CardContent>
+
                         </Card>
 
                         <Card>
+
                             <CardHeader>
-                                <CardTitle>Matrix Entry</CardTitle>
+                                <CardTitle>
+                                    Matrix Entry
+                                </CardTitle>
                             </CardHeader>
 
                             <CardContent>
+
                                 <MatrixGrid
                                     matrix={matrix}
                                     setMatrix={setMatrix}
                                 />
+
                             </CardContent>
+
                         </Card>
 
                         <ActionBar
@@ -167,15 +221,20 @@ export default function QRPage() {
                             onClear={clear}
                             loading={loading}
                         />
+
                     </div>
 
                     {/* RIGHT */}
                     <Card>
+
                         <CardHeader>
-                            <CardTitle>Results</CardTitle>
+                            <CardTitle>
+                                Results
+                            </CardTitle>
                         </CardHeader>
 
                         <CardContent className="space-y-6">
+
                             <ResultPanel
                                 title="Matrix Q (Orthogonal)"
                                 matrix={result?.q.matrix}
@@ -187,12 +246,23 @@ export default function QRPage() {
                                 matrix={result?.r.matrix}
                                 isDiagonal={result?.r.statistics.is_diagonal}
                             />
+
                         </CardContent>
+
                     </Card>
+
                 </div>
 
-                <StatsGrid stats={result?.q.statistics} matrix={'Q'} />
-                <StatsGrid stats={result?.r.statistics} matrix={'R'} />
+                <StatsGrid
+                    stats={result?.q.statistics}
+                    matrix={"Q"}
+                />
+
+                <StatsGrid
+                    stats={result?.r.statistics}
+                    matrix={"R"}
+                />
+
             </div>
         </div>
     )
