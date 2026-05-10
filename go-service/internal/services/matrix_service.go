@@ -89,11 +89,11 @@ func gramSchmidt(a [][]float64) ([][]float64, [][]float64) {
 
 		norm = math.Sqrt(norm)
 
-		r[j][j] = utils.RoundDecimal(norm, 4)
+		r[j][j] = norm
 
 		//Normalize vector
 		for i := 0; i < rows; i++ {
-			q[i][j] = utils.RoundDecimal(v[i]/norm, 4)
+			q[i][j] = v[i] / norm
 		}
 	}
 
