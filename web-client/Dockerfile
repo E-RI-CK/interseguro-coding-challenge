@@ -22,6 +22,10 @@ RUN npm install
 
 COPY . .
 
+ARG VITE_GO_API_URL
+
+ENV VITE_GO_API_URL=$VITE_GO_API_URL
+
 RUN npm run build
 
 FROM nginx:alpine
