@@ -432,6 +432,8 @@ Ejemplo:
 - Validación de expiración de token
 - Dockerización completa
 - Frontend integrado
+- Documentación
+- Testing 
 
 ---
 
@@ -471,4 +473,4 @@ docker compose logs
 
 # Autor
 
-Desarrollado como parte del reto técnico de Interseguro.
+- **Andro Valero** - [LinkedIn Profile](https://www.linkedin.com/in/andro-erick-valero-medina-63b90223b/)
