@@ -112,67 +112,6 @@ cd interseguro-coding-challenge
 
 ---
 
-# Configuración de variables de entorno
-
-Cada servicio contiene un archivo `.env.docker`.
-
----
-
-## Go Service
-
-Ruta:
-
-```text
-go-service/.env.docker
-```
-
-Contenido:
-
-```env
-PORT=3000
-
-JWT_SECRET=mysecretkey
-
-WEB_CLIENT_API_URL=http://localhost:5173
-
-NODE_SERVICE_API_URL=http://node-service:4000/api
-
-JWT_SECRET=ndmfO562VLcZ
-```
-
----
-
-## Node Service
-
-Ruta:
-
-```text
-node-service/.env.docker
-```
-
-Contenido:
-
-```env
-PORT=4000
-```
-
----
-
-## Frontend
-
-Ruta:
-
-```text
-web-client/.env.docker
-```
-
-Contenido:
-
-```env
-VITE_GO_API_URL=http://localhost:3000/api
-```
-
----
 
 <!-- # Ejecución general
 
@@ -281,6 +220,70 @@ npm run dev
 ```
 
 Abrir el navegador en el siguiente <a href="http://localhost:5173">link</a> para ver el aplicativo.
+
+---
+
+# Configuración de variables de entorno (documentación)
+
+ `(!) No es necesario crearlos el repositorio ya los tiene definidos.`
+
+Cada servicio contiene un archivo `.env.docker`.
+
+---
+
+## Go Service
+
+Ruta:
+
+```text
+go-service/.env.docker
+```
+
+Contenido:
+
+```env
+PORT=3000
+
+JWT_SECRET=mysecretkey
+
+WEB_CLIENT_API_URL=http://localhost:5173
+
+NODE_SERVICE_API_URL=http://node-service:4000/api
+
+JWT_SECRET=ndmfO562VLcZ
+```
+
+---
+
+## Node Service
+
+Ruta:
+
+```text
+node-service/.env.docker
+```
+
+Contenido:
+
+```env
+PORT=4000
+```
+
+---
+
+## Frontend
+
+Ruta:
+
+```text
+web-client/.env.docker
+```
+
+Contenido:
+
+```env
+VITE_GO_API_URL=http://localhost:3000/api
+```
 
 ---
 
