@@ -1,3 +1,33 @@
+# version: '1.0'
+
+# services:
+
+#   go-service:
+#     build: ./go-service
+#     container_name: go-service
+#     ports:
+#       - "3000:3000"
+#     env_file:
+#       - ./go-service/.env.docker
+
+#   node-service:
+#     build: ./node-service
+#     container_name: node-service
+#     ports:
+#       - "4000:4000"
+#     env_file:
+#       - ./node-service/.env.docker
+
+#   web-client:
+#     build: ./web-client
+#     container_name: web-client
+#     ports:
+#       - "5173:5173"
+#     env_file:
+#       - ./web-client/.env.docker
+#     depends_on:
+#       - go-service
+
 version: '1.0'
 
 services:
@@ -22,7 +52,7 @@ services:
     build: ./web-client
     container_name: web-client
     ports:
-      - "5173:5173"
+      - "5173:80"
     env_file:
       - ./web-client/.env.docker
     depends_on:
