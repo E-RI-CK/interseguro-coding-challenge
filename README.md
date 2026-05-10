@@ -174,6 +174,22 @@ VITE_GO_API_URL=http://localhost:3000/api
 
 ---
 
+<!-- # Ejecución general
+
+Si se quiere ejecutar localmente o usando `docker-compose` se debe crear dentro de la carpeta `web-client/` los archivos .env y .env.docker.
+
+- .env
+
+```env
+VITE_GO_API_URL=http://localhost:3000/api
+```
+
+- .env.docker
+
+```env
+VITE_GO_API_URL=http://localhost:3000/api
+``` -->
+
 # Ejecución con Docker
 
 ## Levantar todos los servicios
